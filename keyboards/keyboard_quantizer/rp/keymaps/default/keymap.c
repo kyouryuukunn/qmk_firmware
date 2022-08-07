@@ -15,6 +15,7 @@
  */
 #include "quantum.h"
 #include QMK_KEYBOARD_H
+#include "keymap_jp.h"
 
 #include "pointing_device.h"
 #include "debug.h"
@@ -41,8 +42,31 @@ typedef enum {
     GESTURE_UP_RIGHT,
 } gesture_id_t;
 
+enum layer_names {
+    _BASE,
+    _LOWER,
+    _RAISE,
+};
+
+#define LOSP LT(_LOWER, KC_SPC)
+#define RAEN LT(_RAISE, KC_ENT)
+
 // clang-format off
-const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {{{KC_NO}}};
+const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+    /* Base */
+    [_BASE] =  LAYOUT(
+    KC_ESC, KC_F1, KC_F2, KC_F3, KC_F4,     KC_F5, KC_F6, KC_F7, KC_F8,     KC_F9, KC_F10, KC_F11, KC_F12,    KC_PSCR, KC_SCROLLLOCK, KC_PAUS,
+    JP_ZKHK, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, JP_MINS, JP_CIRC, JP_YEN, KC_BSPACE, KC_INSERT, KC_HOME, KC_PGUP,       KC_NUMLOCK, KC_KP_SLASH, KC_KP_ASTERISK, KC_KP_MINUS,
+    KC_TAB,   KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, JP_AT, JP_LBRC,           KC_ENT,   KC_DEL, KC_END,  KC_PGDN,          KC_KP_7, KC_KP_8, KC_KP_9, KC_KP_PLUS,
+    KC_CAPS,   KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, JP_SCLN, JP_COLN, JP_RBRC,                                                  KC_KP_4, KC_KP_5, KC_KP_6,
+    KC_LSFT,    KC_Z, KC_X, KC_C, KC_V, KC_B, KC_N, KC_M, KC_COMM, KC_DOT, JP_SLSH, JP_BSLS, KC_RSFT,                 KC_UP,                     KC_KP_1, KC_KP_2, KC_KP_3, KC_KP_ENTER,
+    KC_LCTRL, KC_LGUI, KC_LALT, JP_MHEN, LOSP,  RAEN, JP_KANA, KC_RALT, KC_RGUI, KC_APP, KC_RCTRL,            KC_LEFT,  KC_DOWN, KC_RIGHT,       KC_KP_0,          KC_KP_DOT,
+
+    KC_BTN1, KC_BTN2, KC_BTN3, KC_BTN4, KC_BTN5, KC_BTN6, KC_BTN7, KC_BTN8,
+    KC_NO, KC_NO, KC_NO, KC_NO,
+    KC_WH_U, KC_WH_D, KC_WH_L, KC_WH_R
+    )
+};
 // clang-format on
 
 extern bool mouse_send_flag;
@@ -161,24 +185,24 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
 
 // override keymap_key_to_keycode
 uint16_t keymap_key_to_keycode(uint8_t layer, keypos_t key) {
-    uint16_t keycode = KC_NO;
-    // uint16_t keycode = pgm_read_word(&keymaps[(layer)][(key.row)][(key.col)]);
-    if (layer < DYNAMIC_KEYMAP_LAYER_COUNT && key.row < MATRIX_ROWS && key.col < MATRIX_COLS) {
-        keycode = dynamic_keymap_get_keycode(layer, key.row, key.col);
-    }
+    /* uint16_t keycode = KC_NO; */
+    uint16_t to_keycode = pgm_read_word(&keymaps[(layer)][(key.row)][(key.col)]);
+    /* if (layer < DYNAMIC_KEYMAP_LAYER_COUNT && key.row < MATRIX_ROWS && key.col < MATRIX_COLS) { */
+    /*     keycode = dynamic_keymap_get_keycode(layer, key.row, key.col); */
+    /* } */
 
     // To use LT with mouse button, replace keycode and save offset
-    if (keycode >= QK_LAYER_TAP && keycode <= QK_LAYER_TAP_MAX) {
-        uint8_t kc = keycode & 0xFF;
+    if (to_keycode >= QK_LAYER_TAP && to_keycode <= QK_LAYER_TAP_MAX) {
+        uint8_t kc = to_keycode & 0xFF;
         if (kc >= KC_BTN1 && kc <= KC_BTN5) {
             kc_no_to_kc_offset = kc;
-            return keycode & 0xFF00;
+            return to_keycode & 0xFF00;
         } else {
             kc_no_to_kc_offset = 0;
         }
     }
 
-    return keycode;
+    return to_keycode;
 }
 
 void matrix_scan_user(void) {

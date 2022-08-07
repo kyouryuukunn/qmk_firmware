@@ -85,13 +85,24 @@ void set_key_override(OVERRIDE_MODE mode);
  * The second converts the arguments into a two-dimensional array which
  * represents the switch matrix.
  */
+/* config.hで以下に数値が設定されていることを前提とする
+ * MATRIX_MODIFIER_ROW 21
+ * MATRIX_MSBTN_ROW 22
+ * MATRIX_MSGES_ROW 23
+ * MATRIX_MSWHEEL_ROW 23
+ * MATRIX_MSWHEEL_COL 4
+ */
+
 #define LAYOUT(\
 esc, f1, f2, f3, f4,     f5, f6, f7, f8,     f9, f10, f11, f12,           pscr, scrl, pause, \
 hanzen, k1, k2, k3, k4, k5, k6, k7, k8, k9, k0, min, circ, yen, bspc,     ins, home, pageup,       numlock, kp_slsh, kp_astr, kp_min, \
 tab,     q,  w,  e,  r,  t,  y,  u,  i,  o,  p,  at, lbrc,     ent,       del, end, pagedown,      kp7, kp8, kp9, kp_plus, \
 caps,    a,  s,  d,  f,  g,  h,  j,  k,  l,  scln, cln, rbrc,                                      kp4, kp5, kp6, \
 lsft,    z,  x,  c,  v,  b,  n,  m, comm, dot, slsh, bsls, rsft,                up,                kp1, kp2, kp3, kp_ent, \
-lctrl, lgui, lalt, mhen, spc, henk, kana, ralt, rgui, app, rctrl,        left, down, right,        kp0,      kp_dot \
+lctrl, lgui, lalt, mhen, spc, henk, kana, ralt, rgui, app, rctrl,        left, down, right,        kp0,      kp_dot, \
+ms_btn1, ms_btn2, ms_btn3, ms_btn4, ms_btn5, ms_btn6, ms_btn7, ms_btn8, \
+ges1, ges2, ges3, ges4, \
+wh_u, wh_d, wh_l, wh_r \
 ) { \
     { KC_NO, KC_NO, KC_NO, KC_NO, a, b, c, d }, \
     { e, f, g, h, i, j, k, l}, \
@@ -114,5 +125,7 @@ lctrl, lgui, lalt, mhen, spc, henk, kana, ralt, rgui, app, rctrl,        left, d
     { KC_LANG1, KC_LANG2, KC_LANG3, KC_LANG4, KC_LANG5, KC_LANG6, KC_LANG7, KC_LANG8} ,\
     { KC_LANG9, KC_ALT_ERASE, KC_SYSREQ, KC_CANCEL, KC_CLEAR, KC_PRIOR, KC_RETURN, KC_SEPARATOR} , \
     { KC_OUT,  KC_OPER, KC_CLEAR_AGAIN, KC_CRSEL, KC_EXSEL, KC_NO, KC_NO, KC_NO} ,\
-    { lctrl, lsft, lalt, lgui, rctrl, rsft, ralt, rgui } \
+    { lctrl, lsft, lalt, lgui, rctrl, rsft, ralt, rgui }, \
+    {ms_btn1, ms_btn2, ms_btn3, ms_btn4, ms_btn5, ms_btn6, ms_btn7, ms_btn8}, \
+    {ges1, ges2, ges3, ges4, wh_u, wh_d, wh_l, wh_r} \
 }
