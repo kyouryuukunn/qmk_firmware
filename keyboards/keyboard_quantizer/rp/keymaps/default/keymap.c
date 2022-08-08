@@ -73,6 +73,12 @@ enum layer_names {
     _TEMPLATE,
 };
 
+#define MC_REC1   DYN_REC_START1   
+#define MC_REC2   DYN_REC_START2   
+#define MC_PLAY1  DYN_MACRO_PLAY1   
+#define MC_PLAY2  DYN_MACRO_PLAY1   
+#define MC_STOP   DYN_REC_STOP     
+
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Base */
@@ -91,10 +97,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_HENKAN] =  LAYOUT(
     _______, _______, _______, _______, _______,     _______, _______, _______, _______,     _______, KC_MUTE, KC_VOLD, KC_VOLU,   _______, _______, _______,
-    _______, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11, KC_F12,_______, _______,               _______, _______, _______,    _______, _______, _______, _______,
-    _______,  KC_1,  KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, JP_MINS, JP_CIRC,                   JP_YEN,             _______, _______, _______,    _______, _______, _______, _______,
+    _______, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11, KC_F12,_______, _______,               DM_REC1, DM_REC2, DM_RSTP,    _______, _______, _______, _______,
+    _______,  KC_1,  KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, JP_MINS, JP_CIRC,                   JP_YEN,             DM_PLY1, DM_PLY2, _______,    _______, _______, _______, _______,
     _______,   CTRL_A,  NEXTWIN, KC_INS, ALT_F4,  KC_END, KC_LEFT , KC_DOWN, KC_UP, KC_RGHT, KC_PGDN, KC_PGUP, _______ ,                                         _______, _______, _______,
-    _______,    CTRL_Z,  CTRL_X,  CTRL_C,  CTRL_V,  KC_HOME, KC_BSPC, KC_DEL, WIN_V, _______, _______, _______, _______,                   _______,            _______, _______, _______, _______,
+    _______,    CTRL_Z,  CTRL_X,  CTRL_C,  CTRL_V,  KC_HOME, KC_BSPC, KC_DEL, WIN_V, _______, _______, _______, _______,                     _______,            _______, _______, _______, _______,
     _______, _______, _______, _______, SFT_SSPC, KC_APP, _______, _______, _______, _______, _______,                             _______,  _______, _______,   _______,          _______,
 
     _______, _______, _______, _______, _______, _______, _______, _______,
@@ -313,6 +319,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             if (gui_pscr_pressed) register_code16(KC_PSCR);
             gui_pscr_pressed = false;
         }
+	// CAPS_LOCKからのツーストロークキー
         if (keycode != OSL_CAPS){
             if (caps_pressed) {
                 caps_pressed = false;
@@ -342,6 +349,30 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                         register_code16(KC_LGUI);
                         register_code16(KC_4);
                         unregister_code16(KC_4);
+                        unregister_code16(KC_LGUI);
+                        break;
+                    case KC_H:
+                        register_code16(KC_LGUI);
+                        register_code16(KC_LEFT);
+                        unregister_code16(KC_LEFT);
+                        unregister_code16(KC_LGUI);
+                        break;
+                    case KC_J:
+                        register_code16(KC_LGUI);
+                        register_code16(KC_DOWN);
+                        unregister_code16(KC_DOWN);
+                        unregister_code16(KC_LGUI);
+                        break;
+                    case KC_K:
+                        register_code16(KC_LGUI);
+                        register_code16(KC_UP);
+                        unregister_code16(KC_UP);
+                        unregister_code16(KC_LGUI);
+                        break;
+                    case KC_L:
+                        register_code16(KC_LGUI);
+                        register_code16(KC_RIGHT);
+                        unregister_code16(KC_RIGHT);
                         unregister_code16(KC_LGUI);
                         break;
                     case KC_PAUS:
