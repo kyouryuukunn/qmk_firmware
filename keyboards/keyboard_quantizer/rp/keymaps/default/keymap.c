@@ -350,11 +350,43 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                         unregister_code16(KC_LGUI);
 			return false;
                         break;
-                    case KC_E:
+                    case KC_N:
 			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_4);
                         unregister_code16(KC_4);
+                        unregister_code16(KC_LGUI);
+			return false;
+                        break;
+                    case KC_S:
+			caps_pressed = false;
+                        register_code16(KC_LGUI);
+                        register_code16(KC_6);
+                        unregister_code16(KC_6);
+                        unregister_code16(KC_LGUI);
+			return false;
+                        break;
+                    case KC_D:
+			caps_pressed = false;
+                        register_code16(KC_LGUI);
+                        register_code16(KC_7);
+                        unregister_code16(KC_7);
+                        unregister_code16(KC_LGUI);
+			return false;
+                        break;
+                    case KC_W:
+			caps_pressed = false;
+                        register_code16(KC_LGUI);
+                        register_code16(KC_8);
+                        unregister_code16(KC_8);
+                        unregister_code16(KC_LGUI);
+			return false;
+                        break;
+                    case KC_E:
+			caps_pressed = false;
+                        register_code16(KC_LGUI);
+                        register_code16(KC_9);
+                        unregister_code16(KC_9);
                         unregister_code16(KC_LGUI);
 			return false;
                         break;
