@@ -322,64 +322,80 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
 	// CAPS_LOCKからのツーストロークキー
         if (keycode != OSL_CAPS){
             if (caps_pressed) {
-                caps_pressed = false;
                 switch (keycode) {
                     case KC_A:
 			// 以下の形式ではボタンが押しっぱなしになる
                         /* register_code16(G(KC_1)); */
                         /* unregister_code16(G(KC_1)); */
+			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_1);
                         unregister_code16(KC_1);
                         unregister_code16(KC_LGUI);
+			return false;
                         break;
                     case KC_G:
+			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_2);
                         unregister_code16(KC_2);
                         unregister_code16(KC_LGUI);
+			return false;
                         break;
                     case KC_F:
+			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_3);
                         unregister_code16(KC_3);
                         unregister_code16(KC_LGUI);
+			return false;
                         break;
                     case KC_E:
+			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_4);
                         unregister_code16(KC_4);
                         unregister_code16(KC_LGUI);
+			return false;
                         break;
                     case KC_H:
+			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_LEFT);
                         unregister_code16(KC_LEFT);
                         unregister_code16(KC_LGUI);
+			return false;
                         break;
                     case KC_J:
+			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_DOWN);
                         unregister_code16(KC_DOWN);
                         unregister_code16(KC_LGUI);
+			return false;
                         break;
                     case KC_K:
+			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_UP);
                         unregister_code16(KC_UP);
                         unregister_code16(KC_LGUI);
+			return false;
                         break;
                     case KC_L:
+			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_RIGHT);
                         unregister_code16(KC_RIGHT);
                         unregister_code16(KC_LGUI);
+			return false;
                         break;
                     case KC_PAUS:
+			caps_pressed = false;
                         layer_invert(_QWERTY);
+			return false;
                         break;
                 }
-                return false;
             }
         }
     }
