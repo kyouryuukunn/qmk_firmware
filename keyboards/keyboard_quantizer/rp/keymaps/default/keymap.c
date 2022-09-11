@@ -27,7 +27,8 @@
 
 user_config_t user_config;
 #define GESTURE_MOVE_THRESHOLD_DEFAULT 50
-#define TWO_STROKE_THRESHOLD 200
+#define TWO_STROKE_THRESHOLD 300
+#define ALT_TAB_TIME 400
 
 enum custom_keycodes {
     SPD_1 = SAFE_RANGE,
@@ -316,7 +317,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             alt_gui_pressed = false;
         }
         if (keycode != GUI_PSCR){
-            if (gui_pscr_pressed) register_code16(KC_PSCR);
+            if (gui_pscr_pressed) register_code16(KC_LGUI);
             gui_pscr_pressed = false;
         }
 	// CAPS_LOCKからのツーストロークキー
@@ -434,10 +435,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     switch (keycode) {
         case LT2_MHEN:
             user_lt(record, _HENKAN, KC_ENT, &mhen_pressed, &mhen_pressed_time, true);
+            if (!record->event.pressed && is_alt_tab_active) {
+	        unregister_code16(KC_LALT);
+	        is_alt_tab_active = false;
+	    }
             return false;
             break;
         case LT2_HENK:
             user_lt(record, _HENKAN, KC_HENK, &henk_pressed, &henk_pressed_time, true);
+            if (!record->event.pressed && is_alt_tab_active) {
+	        unregister_code16(KC_LALT);
+	        is_alt_tab_active = false;
+	    }
             return false;
             break;
         /* case FN1_PSCR: */
@@ -697,7 +706,7 @@ void matrix_scan_user(void) {
 
    // Alt + tab用
     if (is_alt_tab_active) {
-        if (timer_elapsed(alt_tab_timer) > 400) {
+        if (timer_elapsed(alt_tab_timer) > ALT_TAB_TIME) {
             unregister_code16(KC_LALT);
             is_alt_tab_active = false;
         }
