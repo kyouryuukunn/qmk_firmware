@@ -28,7 +28,7 @@
 user_config_t user_config;
 #define GESTURE_MOVE_THRESHOLD_DEFAULT 50
 #define TWO_STROKE_THRESHOLD 300
-#define ALT_TAB_TIME 400
+#define ALT_TAB_TIME 1000
 
 enum custom_keycodes {
     SPD_1 = SAFE_RANGE,
@@ -173,6 +173,7 @@ static uint16_t caps_pressed_time = 0;
 /* static uint16_t fn2_caps_pressed_time = 0; */
 static bool is_alt_tab_active = false;
 static bool is_lctl_active = false;
+static bool is_kana_active = false;
 static uint16_t alt_tab_timer = 0;
 
 // user_lt(record, ホールド時移行先レイヤー, タップ時のキーコード, モディファイアキー押下判定のための変数, trueならTAPPING_TERMに影響受けない)
@@ -309,7 +310,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             sft_zkhk_pressed  = false;
         }
         if (keycode != ALT_KANA){
-            if (alt_kana_pressed) register_code16(KC_RALT);
+            if (alt_kana_pressed) {register_code16(KC_RALT); is_kana_active = true;}
             alt_kana_pressed = false;
         }
         if (keycode != ALT_GUI){
@@ -492,6 +493,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             break;
         case ALT_KANA:
             user_mt(record, KC_RALT, KC_KANA, &alt_kana_pressed, &alt_kana_pressed_time, true);
+            if (!record->event.pressed) is_kana_active = false;
             return false;
             break;
         case CTL_APP:
@@ -516,6 +518,147 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                     unregister_code16(KC_TAB);
                 } else {
                     unregister_code16(KC_I);
+                }
+            }
+            return false;
+            break;
+	// 左手マウス用
+        case KC_DOT: // Kana + . = Ctrl + C
+            if (record->event.pressed) {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    unregister_code16(KC_RALT);
+                    register_code16(C(KC_C));
+                    register_code16(KC_RALT);
+                } else {
+                    register_code16(KC_DOT);
+                }
+            } else {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    unregister_code16(C(KC_C));
+                } else {
+                    unregister_code16(KC_DOT);
+                }
+            }
+            return false;
+            break;
+        case KC_SCLN: // Kana + ; = Ctrl + V
+            if (record->event.pressed) {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    unregister_code16(KC_RALT);
+                    register_code16(C(KC_V));
+                    register_code16(KC_RALT);
+                } else {
+                    register_code16(KC_SCLN);
+                }
+            } else {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    unregister_code16(C(KC_V));
+                } else {
+                    unregister_code16(KC_SCLN);
+                }
+            }
+            return false;
+            break;
+        case KC_SLSH: // Kana + / = Ctrl + X
+            if (record->event.pressed) {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    unregister_code16(KC_RALT);
+                    register_code16(C(KC_X));
+                    register_code16(KC_RALT);
+                } else {
+                    register_code16(KC_SLSH);
+                }
+            } else {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    unregister_code16(C(KC_X));
+                } else {
+                    unregister_code16(KC_SLSH);
+                }
+            }
+            return false;
+            break;
+        case KC_BSLS: // Kana + \ = Ctrl + Z
+            if (record->event.pressed) {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    unregister_code16(KC_RALT);
+                    register_code16(C(KC_Z));
+                    register_code16(KC_RALT);
+                } else {
+                    register_code16(KC_BSLS);
+                }
+            } else {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    unregister_code16(C(KC_Z));
+                } else {
+                    unregister_code16(KC_BSLS);
+                }
+            }
+            return false;
+            break;
+	case KC_COLN: // Kana + : = Tab
+            if (record->event.pressed) {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    register_code16(KC_TAB);
+                } else {
+                    register_code16(KC_COLN);
+                }
+            } else {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    unregister_code16(KC_TAB);
+                } else {
+                    unregister_code16(KC_COLN);
+                }
+            }
+            return false;
+            break;
+	case JP_RBRC: // Kana + : = Ctrl + A
+            if (record->event.pressed) {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    unregister_code16(KC_RALT);
+                    register_code16(C(KC_A));
+                    register_code16(KC_RALT);
+                } else {
+                    register_code16(JP_RBRC);
+                }
+            } else {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    unregister_code16(C(KC_A));
+                } else {
+                    unregister_code16(JP_RBRC);
+                }
+            }
+            return false;
+            break;
+	case KC_AT: // Kana + @ = Alt + F4
+            if (record->event.pressed) {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    register_code16(KC_F4);
+                } else {
+                    register_code16(KC_AT);
+                }
+            } else {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    unregister_code16(KC_F4);
+                } else {
+                    unregister_code16(KC_AT);
+                }
+            }
+            return false;
+            break;
+	case JP_LBRC: // Kana + : = Ctrl + A
+            if (record->event.pressed) {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    unregister_code16(KC_RALT);
+                    register_code16(KC_ESC);
+                    register_code16(KC_RALT);
+                } else {
+                    register_code16(JP_LBRC);
+                }
+            } else {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    unregister_code16(KC_ESC);
+                } else {
+                    unregister_code16(JP_LBRC);
                 }
             }
             return false;
@@ -719,7 +862,7 @@ void matrix_scan_user(void) {
     if (sft_zkhk_pressed && (timer_elapsed(sft_zkhk_pressed_time) > TAPPING_TERM)) {register_code16(KC_LSFT); sft_zkhk_pressed  = false;}
     if (sft_spc_pressed  && (timer_elapsed(sft_spc_pressed_time)  > TAPPING_TERM)) {register_code16(KC_LSFT); sft_spc_pressed  = false;}
     if (sft_sspc_pressed && (timer_elapsed(sft_sspc_pressed_time) > TAPPING_TERM)) {register_code16(KC_LSFT); sft_sspc_pressed  = false;}
-    if (alt_kana_pressed && (timer_elapsed(alt_kana_pressed_time) > TAPPING_TERM)) {register_code16(KC_RALT); alt_kana_pressed = false;}
+    if (alt_kana_pressed && (timer_elapsed(alt_kana_pressed_time) > TAPPING_TERM)) {register_code16(KC_RALT); is_kana_active = true; alt_kana_pressed = false;}
     if (ctl_app_pressed  && (timer_elapsed(ctl_app_pressed_time)  > TAPPING_TERM)) {register_code16(KC_RCTL); ctl_app_pressed  = false;}
 
     if (henk_pressed  && (timer_elapsed(henk_pressed_time)  > TAPPING_TERM)) {henk_pressed  = false;}
