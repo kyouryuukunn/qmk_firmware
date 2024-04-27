@@ -13,6 +13,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+/* 基本的にはNodokaの動作を踏襲しているが、caps + pause でnodokaモードをトグル(デフォルトオン) クリックの左右反転のレイアウトで実施*/
+/* Insertからのpagedowmまでのキーを変換とともに押すとマクロ実行 */
+/*  */
+/* DM_REC1, DM_REC2, DM_RSTP */
+/* DM_PLY1, DM_PLY2,     -   */
+
 #include "quantum.h"
 #include QMK_KEYBOARD_H
 #include "keymap_jp.h"
@@ -176,6 +182,19 @@ static bool is_lctl_active = false;
 static bool is_kana_active = false;
 static uint16_t alt_tab_timer = 0;
 
+/* 左手マウス用 */
+static bool kc_i_with_mouse = false;
+static bool kc_dot_with_mouse = false;
+static bool jp_slsh_with_mouse = false;
+static bool jp_bsls_with_mouse = false;
+static bool kc_l_with_mouse = false;
+static bool jp_scln_with_mouse = false;
+static bool jp_coln_with_mouse = false;
+static bool jp_rbrc_with_mouse = false;
+static bool kc_ent_with_mouse = false;
+static bool jp_at_with_mouse = false;
+static bool jp_lbrc_with_mouse = false;
+
 // user_lt(record, ホールド時移行先レイヤー, タップ時のキーコード, モディファイアキー押下判定のための変数, trueならTAPPING_TERMに影響受けない)
 static void user_lt(keyrecord_t *record, int layer, uint16_t keycode, bool *modifier_pressed, uint16_t *modifier_pressed_time, bool tapping_term_disable) {
         if (record->event.pressed) {
@@ -313,11 +332,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
         if (keycode != ALT_KANA){
             if (alt_kana_pressed) {
                 if (keycode != KC_DOT   && 
-                    keycode != JP_SCLN  && 
                     keycode != JP_SLSH  && 
                     keycode != JP_BSLS  && 
-                    /* keycode != JP_COLN  &&  // Tabは通常どおりにaltを処理 */
-                    keycode != JP_RBRC  && 
+
+                    keycode != KC_L  && 
+                    keycode != JP_SCLN  && 
+                    keycode != JP_COLN  && 
+                    /* keycode != JP_RBRC  &&  */ // Tabは通常どおりにaltを処理
+                    keycode != KC_ENT  && 
                     keycode != JP_AT    && 
                     keycode != JP_LBRC
                     ) {
@@ -534,12 +556,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                     unregister_code16(KC_LCTL);
                     register_code16(KC_TAB);
                     register_code16(KC_LCTL);
+		    kc_i_with_mouse = true;
                 } else {
                     register_code16(KC_I);
                 }
             } else {
-                if (is_lctl_active && layer_state_is(_NODOKA)) {
+                if (kc_i_with_mouse && layer_state_is(_NODOKA)) {
                     unregister_code16(KC_TAB);
+		    kc_i_with_mouse = false;
                 } else {
                     unregister_code16(KC_I);
                 }
@@ -551,30 +575,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             if (record->event.pressed) {
                 if (is_kana_active && layer_state_is(_NODOKA)) {
                     register_code16(C(KC_C));
+		    kc_dot_with_mouse = true;
                 } else {
                     register_code16(KC_DOT);
                 }
             } else {
-                if (is_kana_active && layer_state_is(_NODOKA)) {
+                if (kc_dot_with_mouse && layer_state_is(_NODOKA)) {
                     unregister_code16(C(KC_C));
+		    kc_dot_with_mouse = false;
                 } else {
                     unregister_code16(KC_DOT);
-                }
-            }
-            return false;
-            break;
-        case JP_SCLN: // Kana + ; = Ctrl + V
-            if (record->event.pressed) {
-                if (is_kana_active && layer_state_is(_NODOKA)) {
-                    register_code16(C(KC_V));
-                } else {
-                    register_code16(JP_SCLN);
-                }
-            } else {
-                if (is_kana_active && layer_state_is(_NODOKA)) {
-                    unregister_code16(C(KC_V));
-                } else {
-                    unregister_code16(JP_SCLN);
                 }
             }
             return false;
@@ -583,12 +593,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             if (record->event.pressed) {
                 if (is_kana_active && layer_state_is(_NODOKA)) {
                     register_code16(C(KC_X));
+		    jp_slsh_with_mouse = true;
                 } else {
                     register_code16(JP_SLSH);
                 }
             } else {
-                if (is_kana_active && layer_state_is(_NODOKA)) {
+                if (jp_slsh_with_mouse && layer_state_is(_NODOKA)) {
                     unregister_code16(C(KC_X));
+		    jp_slsh_with_mouse = false;
                 } else {
                     unregister_code16(JP_SLSH);
                 }
@@ -599,30 +611,110 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             if (record->event.pressed) {
                 if (is_kana_active && layer_state_is(_NODOKA)) {
                     register_code16(C(KC_Z));
+		    jp_bsls_with_mouse = true;
                 } else {
                     register_code16(JP_BSLS);
                 }
             } else {
-                if (is_kana_active && layer_state_is(_NODOKA)) {
+                if (jp_bsls_with_mouse && layer_state_is(_NODOKA)) {
                     unregister_code16(C(KC_Z));
+		    jp_bsls_with_mouse = false;
                 } else {
                     unregister_code16(JP_BSLS);
                 }
             }
             return false;
             break;
-	case JP_RBRC: // Kana + : = Ctrl + A
+        case KC_L: // Kana + l = Alt + Y
             if (record->event.pressed) {
                 if (is_kana_active && layer_state_is(_NODOKA)) {
-                    register_code16(C(KC_A));
+                    register_code16(KC_RALT);
+                    register_code16(KC_Y);
+		    kc_l_with_mouse = true;
+                } else {
+                    register_code16(KC_L);
+                }
+            } else {
+                if (kc_l_with_mouse && layer_state_is(_NODOKA)) {
+                    unregister_code16(KC_Y);
+                    unregister_code16(KC_RALT);
+		    kc_l_with_mouse = false;
+                } else {
+                    unregister_code16(KC_L);
+                }
+            }
+            return false;
+            break;
+        case JP_SCLN: // Kana + ; = Ctrl + V
+            if (record->event.pressed) {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    register_code16(C(KC_V));
+		    jp_scln_with_mouse = true;
+                } else {
+                    register_code16(JP_SCLN);
+                }
+            } else {
+                if (jp_scln_with_mouse && layer_state_is(_NODOKA)) {
+                    unregister_code16(C(KC_V));
+		    jp_scln_with_mouse = false;
+                } else {
+                    unregister_code16(JP_SCLN);
+                }
+            }
+            return false;
+            break;
+	case JP_COLN: // Kana + : = A + N
+            if (record->event.pressed) {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    register_code16(KC_RALT);
+                    register_code16(KC_N);
+		    jp_coln_with_mouse = true;
+                } else {
+                    register_code16(JP_COLN);
+                }
+            } else {
+                if (jp_coln_with_mouse && layer_state_is(_NODOKA)) {
+                    unregister_code16(KC_N);
+                    unregister_code16(KC_RALT);
+		    jp_coln_with_mouse = false;
+                } else {
+                    unregister_code16(JP_COLN);
+                }
+            }
+            return false;
+            break;
+	case JP_RBRC: // Kana + ] = TAB
+            if (record->event.pressed) {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    register_code16(KC_TAB);
+		    jp_rbrc_with_mouse = true;
                 } else {
                     register_code16(JP_RBRC);
                 }
             } else {
-                if (is_kana_active && layer_state_is(_NODOKA)) {
-                    unregister_code16(C(KC_A));
+                if (jp_rbrc_with_mouse && layer_state_is(_NODOKA)) {
+                    unregister_code16(KC_TAB);
+		    jp_rbrc_with_mouse = false;
                 } else {
                     unregister_code16(JP_RBRC);
+                }
+            }
+            return false;
+            break;
+	case KC_ENT: // Kana + Enter = Ctrl + A
+            if (record->event.pressed) {
+                if (is_kana_active && layer_state_is(_NODOKA)) {
+                    register_code16(C(KC_A));
+		    kc_ent_with_mouse = true;
+                } else {
+                    register_code16(KC_ENT);
+                }
+            } else {
+                if (kc_ent_with_mouse && layer_state_is(_NODOKA)) {
+                    unregister_code16(C(KC_A));
+		    kc_ent_with_mouse = false;
+                } else {
+                    unregister_code16(KC_ENT);
                 }
             }
             return false;
@@ -632,49 +724,35 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                 if (is_kana_active && layer_state_is(_NODOKA)) {
                     register_code16(KC_RALT);
                     register_code16(KC_F4);
+		    jp_at_with_mouse = true;
                 } else {
                     register_code16(JP_AT);
                 }
             } else {
-                if (is_kana_active && layer_state_is(_NODOKA)) {
+                if (jp_at_with_mouse && layer_state_is(_NODOKA)) {
                     unregister_code16(KC_F4);
+                    unregister_code16(KC_RALT);
+		    jp_at_with_mouse = false;
                 } else {
                     unregister_code16(JP_AT);
-                    unregister_code16(KC_RALT);
                 }
             }
             return false;
             break;
-	case JP_LBRC: // Kana + : = Ctrl + A
+	case JP_LBRC: // Kana + [ = ESC
             if (record->event.pressed) {
                 if (is_kana_active && layer_state_is(_NODOKA)) {
-                    unregister_code16(KC_RALT);
                     register_code16(KC_ESC);
-                    register_code16(KC_RALT);
+		    jp_lbrc_with_mouse = true;
                 } else {
                     register_code16(JP_LBRC);
                 }
             } else {
-                if (is_kana_active && layer_state_is(_NODOKA)) {
+                if (jp_lbrc_with_mouse && layer_state_is(_NODOKA)) {
                     unregister_code16(KC_ESC);
+		    jp_lbrc_with_mouse = false;
                 } else {
                     unregister_code16(JP_LBRC);
-                }
-            }
-            return false;
-            break;
-	case JP_COLN: // Kana + : = Tab
-            if (record->event.pressed) {
-                if (is_kana_active && layer_state_is(_NODOKA)) {
-                    register_code16(KC_TAB);
-                } else {
-                    register_code16(JP_COLN);
-                }
-            } else {
-                if (is_kana_active && layer_state_is(_NODOKA)) {
-                    unregister_code16(KC_TAB);
-                } else {
-                    unregister_code16(JP_COLN);
                 }
             }
             return false;
@@ -864,12 +942,13 @@ void matrix_scan_user(void) {
     }
 
    // Alt + tab用
-    if (is_alt_tab_active) {
-        if (timer_elapsed(alt_tab_timer) > ALT_TAB_TIME) {
-            unregister_code16(KC_LALT);
-            is_alt_tab_active = false;
-        }
-    }
+   // タイマーは使用しない
+    /* if (is_alt_tab_active) { */
+    /*     if (timer_elapsed(alt_tab_timer) > ALT_TAB_TIME) { */
+    /*         unregister_code16(KC_LALT); */
+    /*         is_alt_tab_active = false; */
+    /*     } */
+    /* } */
      // Mouseとの連携のため
      // TAPPING_TERM以降はモディファイアキーを押下
     if (ctl_esc_pressed  && (timer_elapsed(ctl_esc_pressed_time)  > TAPPING_TERM)) {register_code16(KC_LCTL); is_lctl_active = true; ctl_esc_pressed = false;}
