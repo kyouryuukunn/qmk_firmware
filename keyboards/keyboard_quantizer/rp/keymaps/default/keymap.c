@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /* 基本的にはNodokaの動作を踏襲しているが、caps + ESC でnodokaモードをトグル(デフォルトオン) クリックの左右反転のレイアウトで実施*/
-/* InsertからのpagedowmまでのキーをCaps後に押すとマクロ実行 */
+/* Insertからのpagedowmまでのキーを変換or無変換有りで押すとマクロ実行(Capsでは動作しない) */
 /*  */
 /* DM_REC1, DM_REC2, DM_RSTP */
 /* DM_PLY1, DM_PLY2,     -   */
@@ -22,6 +22,7 @@
 #include "quantum.h"
 #include QMK_KEYBOARD_H
 #include "keymap_jp.h"
+#include <sendstring_jis.h> // macro sendstring for jis keyboard マクロ文字列送信時に日本語キーボード設定での文字化け回避
 #include "macro.h"
 
 #include "pointing_device.h"
@@ -106,8 +107,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [_HENKAN] =  LAYOUT(
     _______, _______, _______, _______, _______,     KC_SYSTEM_POWER, _______, KC_SYSTEM_SLEEP, _______,     _______, KC_MUTE, KC_VOLD, KC_VOLU,   _______, _______, _______,
-    _______, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11, KC_F12,_______, _______,               _______, _______, _______,    _______, _______, _______, _______,
-    _______,  KC_1,  KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, JP_MINS, JP_CIRC,                   JP_YEN,             _______, _______, _______,    _______, _______, _______, _______,
+    _______, KC_F1, KC_F2, KC_F3, KC_F4, KC_F5, KC_F6, KC_F7, KC_F8, KC_F9, KC_F10, KC_F11, KC_F12,_______, _______,               DM_REC1, DM_REC2, DM_RSTP,    _______, _______, _______, _______,
+    _______,  KC_1,  KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, JP_MINS, JP_CIRC,                   JP_YEN,             DM_PLY1, DM_PLY2, _______,    _______, _______, _______, _______,
     _______,   CTRL_A,  NEXTWIN, KC_INS, ALT_F4,  KC_END, KC_LEFT , KC_DOWN, KC_UP, KC_RGHT, KC_PGDN, KC_PGUP, _______ ,                                         _______, _______, _______,
     _______,    CTRL_Z,  CTRL_X,  CTRL_C,  CTRL_V,  KC_HOME, KC_BSPC, KC_DEL, WIN_V, _______, _______, _______, _______,                     _______,            _______, _______, _______, _______,
     _______, _______, _______, _______, SFT_SSPC, KC_APP, _______, _______, _______, _______, _______,                             _______,  _______, _______,   _______,          _______,
@@ -363,7 +364,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
         if (keycode != OSL_CAPS){
             if (caps_pressed) {
                 switch (keycode) {
-                    case KC_A:
+                    case KC_A:  // win + 1
 			// 以下の形式ではボタンが押しっぱなしになる
                         /* register_code16(G(KC_1)); */
                         /* unregister_code16(G(KC_1)); */
@@ -374,7 +375,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                         unregister_code16(KC_LGUI);
 			return false;
                         break;
-                    case KC_G:
+                    case KC_G:  // win + 2
 			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_2);
@@ -382,7 +383,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                         unregister_code16(KC_LGUI);
 			return false;
                         break;
-                    case KC_F:
+                    case KC_F:  // win + 3
 			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_3);
@@ -390,7 +391,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                         unregister_code16(KC_LGUI);
 			return false;
                         break;
-                    case KC_N:
+                    case KC_N:  // win + 4
 			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_4);
@@ -463,7 +464,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                         unregister_code16(KC_LGUI);
 			return false;
                         break;
-                    case KC_T:  // powertoys前提
+                    case KC_T:  // powertoys前提 W + C + T
 			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_LCTRL);
@@ -492,36 +493,36 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
 			SEND_STRING(MACRO3_STRINGS);
 			return false;
                         break;
-                    case KC_INSERT: // DM_REC1
-			caps_pressed = false;
-                        register_code16(DM_REC1);
-                        unregister_code16(DM_REC1);
-			return false;
-                        break;
-                    case KC_HOME: // DM_REC2
-			caps_pressed = false;
-                        register_code16(DM_REC2);
-                        unregister_code16(DM_REC2);
-			return false;
-                        break;
-                    case KC_PGUP: // DM_RSTP
-			caps_pressed = false;
-                        register_code16(DM_RSTP);
-                        unregister_code16(DM_RSTP);
-			return false;
-                        break;
-                    case KC_DEL: // DM_PLY1
-			caps_pressed = false;
-                        register_code16(DM_PLY1);
-                        unregister_code16(DM_PLY1);
-			return false;
-                        break;
-                    case KC_END: // DM_PLY2
-			caps_pressed = false;
-                        register_code16(DM_PLY2);
-                        unregister_code16(DM_PLY2);
-			return false;
-                        break;
+                    /* case KC_INSERT: // DM_REC1 */
+			/* caps_pressed = false; */
+                    /*     register_code16(DM_REC1); */
+                    /*     unregister_code16(DM_REC1); */
+			/* return false; */
+                    /*     break; */
+                    /* case KC_HOME: // DM_REC2 */
+			/* caps_pressed = false; */
+                    /*     register_code16(DM_REC2); */
+                    /*     unregister_code16(DM_REC2); */
+			/* return false; */
+                    /*     break; */
+                    /* case KC_PGUP: // DM_RSTP */
+			/* caps_pressed = false; */
+                    /*     register_code16(DM_RSTP); */
+                    /*     unregister_code16(DM_RSTP); */
+			/* return false; */
+                    /*     break; */
+                    /* case KC_DEL: // DM_PLY1 */
+			/* caps_pressed = false; */
+                    /*     register_code16(DM_PLY1); */
+                    /*     unregister_code16(DM_PLY1); */
+			/* return false; */
+                    /*     break; */
+                    /* case KC_END: // DM_PLY2 */
+			/* caps_pressed = false; */
+                    /*     register_code16(DM_PLY2); */
+                    /*     unregister_code16(DM_PLY2); */
+			/* return false; */
+                    /*     break; */
 		}
             }
         }
@@ -818,10 +819,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             break;
 	// 直接_HENKANレイヤーにC(KC_A)と置くとprocess_recordが呼びだされないようでタップが呼び出されてしまう
   	case CTRL_A:
+	     // モディファイアキーを含むキーは、離す前に他のキーを押して意図しない動作を誘発しないために、離すまでをセットにする
+	     // 例: 無変換 + VでVを離す前にJを押すとCtrl + V + Down になってしまう
             if (record->event.pressed) {
                 register_code16(KC_LCTRL);
                 register_code16(KC_A);
-            } else {
                 unregister_code16(KC_A);
                 unregister_code16(KC_LCTRL);
             }
@@ -830,7 +832,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             if (record->event.pressed) {
                 register_code16(KC_LCTRL);
                 register_code16(KC_Z);
-            } else {
                 unregister_code16(KC_Z);
                 unregister_code16(KC_LCTRL);
             }
@@ -839,7 +840,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             if (record->event.pressed) {
                 register_code16(KC_LCTRL);
                 register_code16(KC_X);
-            } else {
                 unregister_code16(KC_X);
                 unregister_code16(KC_LCTRL);
             }
@@ -848,7 +848,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             if (record->event.pressed) {
                 register_code16(KC_LCTRL);
                 register_code16(KC_C);
-            } else {
                 unregister_code16(KC_C);
                 unregister_code16(KC_LCTRL);
             }
@@ -857,7 +856,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             if (record->event.pressed) {
                 register_code16(KC_LCTRL);
                 register_code16(KC_V);
-            } else {
                 unregister_code16(KC_V);
                 unregister_code16(KC_LCTRL);
             }
@@ -866,7 +864,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             if (record->event.pressed) {
                 register_code16(KC_LALT);
                 register_code16(KC_F4);
-            } else {
                 unregister_code16(KC_F4);
                 unregister_code16(KC_LALT);
             }
@@ -886,7 +883,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             if (record->event.pressed) {
                 register_code16(KC_LGUI);
                 register_code16(KC_V);
-            } else {
                 unregister_code16(KC_V);
                 unregister_code16(KC_LGUI);
             }
