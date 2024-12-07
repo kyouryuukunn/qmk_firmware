@@ -89,6 +89,7 @@ enum layer_names {
 #define MC_PLAY2  DYN_MACRO_PLAY1   
 #define MC_STOP   DYN_REC_STOP     
 
+ // なぜか入れるハードで動作が異なる KC_RCTRL,  KC_RGUIの位置に注意 とりあえず両方RCTRLにした
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Base */
@@ -98,7 +99,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_TAB,   KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, JP_AT, JP_LBRC,           KC_ENT,           KC_DEL, KC_END,  KC_PGDN,          KC_KP_7, KC_KP_8, KC_KP_9, KC_KP_PLUS,
     OSL_CAPS,  KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, JP_SCLN, JP_COLN, JP_RBRC,                                                          KC_KP_4, KC_KP_5, KC_KP_6,
     SFT_ZKHK,    KC_Z, KC_X, KC_C, KC_V, KC_B, KC_N, KC_M, KC_COMM, KC_DOT, JP_SLSH, JP_BSLS, KC_RSFT,                           KC_UP,                  KC_KP_1, KC_KP_2, KC_KP_3, KC_KP_ENTER,
-    CTL_ESC, GUI_PSCR, ALT_GUI, LT2_MHEN, SFT_SPC, LT2_HENK, ALT_KANA, KC_RALT, KC_RGUI, CTL_APP, KC_RCTRL,          KC_LEFT,  KC_DOWN, KC_RIGHT,       KC_KP_0,          KC_KP_DOT,
+    CTL_ESC, GUI_PSCR, ALT_GUI, LT2_MHEN, SFT_SPC, LT2_HENK, ALT_KANA, KC_RALT, KC_RGUI, CTL_APP, KC_RCTL,          KC_LEFT,  KC_DOWN, KC_RIGHT,       KC_KP_0,          KC_KP_DOT,
 
     KC_BTN2, KC_BTN1, KC_BTN3, KC_BTN4, KC_BTN5, KC_BTN6, KC_BTN7, KC_BTN8,
     KC_NO, KC_NO, KC_NO, KC_NO,
@@ -124,7 +125,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_TAB,   KC_Q, KC_W, KC_E, KC_R, KC_T, KC_Y, KC_U, KC_I, KC_O, KC_P, JP_AT, JP_LBRC,           KC_ENT,   KC_DEL, KC_END,  KC_PGDN,          KC_KP_7, KC_KP_8, KC_KP_9, KC_KP_PLUS,
     OSL_CAPS,  KC_A, KC_S, KC_D, KC_F, KC_G, KC_H, KC_J, KC_K, KC_L, JP_SCLN, JP_COLN, JP_RBRC,                                                  KC_KP_4, KC_KP_5, KC_KP_6,
     KC_LSFT,    KC_Z, KC_X, KC_C, KC_V, KC_B, KC_N, KC_M, KC_COMM, KC_DOT, JP_SLSH, JP_BSLS, KC_RSFT,                 KC_UP,                     KC_KP_1, KC_KP_2, KC_KP_3, KC_KP_ENTER,
-    KC_LCTRL, KC_LGUI, KC_LALT, JP_MHEN, KC_SPC,  KC_HENK, JP_KANA, KC_RALT, KC_RGUI, KC_APP, KC_RCTRL,     KC_LEFT,  KC_DOWN, KC_RIGHT,         KC_KP_0,          KC_KP_DOT,
+    KC_LCTL, KC_LGUI, KC_LALT, JP_MHEN, KC_SPC,  KC_HENK, JP_KANA, KC_RALT, KC_RGUI, KC_APP, KC_RCTL,     KC_LEFT,  KC_DOWN, KC_RIGHT,         KC_KP_0,          KC_KP_DOT,
 
     KC_BTN2, KC_BTN1, KC_BTN3, KC_BTN4, KC_BTN5, KC_BTN6, KC_BTN7, KC_BTN8,
     KC_NO, KC_NO, KC_NO, KC_NO,
@@ -374,7 +375,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                         unregister_code16(KC_1);
                         unregister_code16(KC_LGUI);
 			return false;
-                        break;
                     case KC_G:  // win + 2
 			caps_pressed = false;
                         register_code16(KC_LGUI);
@@ -382,7 +382,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                         unregister_code16(KC_2);
                         unregister_code16(KC_LGUI);
 			return false;
-                        break;
                     case KC_F:  // win + 3
 			caps_pressed = false;
                         register_code16(KC_LGUI);
@@ -390,7 +389,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                         unregister_code16(KC_3);
                         unregister_code16(KC_LGUI);
 			return false;
-                        break;
                     case KC_N:  // win + 4
 			caps_pressed = false;
                         register_code16(KC_LGUI);
@@ -398,39 +396,41 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                         unregister_code16(KC_4);
                         unregister_code16(KC_LGUI);
 			return false;
-                        break;
-                    case KC_S:
+                    case KC_O:  // win + 5
+			caps_pressed = false;
+                        register_code16(KC_LGUI);
+                        register_code16(KC_5);
+                        unregister_code16(KC_5);
+                        unregister_code16(KC_LGUI);
+			return false;
+                    case KC_I:  // win + 6
 			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_6);
                         unregister_code16(KC_6);
                         unregister_code16(KC_LGUI);
 			return false;
-                        break;
-                    case KC_D:
+                    case KC_E:  // win + 7
 			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_7);
                         unregister_code16(KC_7);
                         unregister_code16(KC_LGUI);
 			return false;
-                        break;
-                    case KC_W:
+                    case KC_S:  // win + 8
 			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_8);
                         unregister_code16(KC_8);
                         unregister_code16(KC_LGUI);
 			return false;
-                        break;
-                    case KC_E:
+                    case KC_D:  // win + 9
 			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_9);
                         unregister_code16(KC_9);
                         unregister_code16(KC_LGUI);
 			return false;
-                        break;
 		 // Win + 上下左右
                     case KC_H:
 			caps_pressed = false;
@@ -439,7 +439,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                         unregister_code16(KC_LEFT);
                         unregister_code16(KC_LGUI);
 			return false;
-                        break;
                     case KC_J:
 			caps_pressed = false;
                         register_code16(KC_LGUI);
@@ -447,7 +446,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                         unregister_code16(KC_DOWN);
                         unregister_code16(KC_LGUI);
 			return false;
-                        break;
                     case KC_K:
 			caps_pressed = false;
                         register_code16(KC_LGUI);
@@ -455,7 +453,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                         unregister_code16(KC_UP);
                         unregister_code16(KC_LGUI);
 			return false;
-                        break;
                     case KC_L:
 			caps_pressed = false;
                         register_code16(KC_LGUI);
@@ -463,36 +460,30 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                         unregister_code16(KC_RIGHT);
                         unregister_code16(KC_LGUI);
 			return false;
-                        break;
                     case KC_T:  // powertoys前提 W + C + T
 			caps_pressed = false;
                         register_code16(KC_LGUI);
-                        register_code16(KC_LCTRL);
+                        register_code16(KC_LCTL);
                         register_code16(KC_T);
-                        unregister_code16(KC_LCTRL);
+                        unregister_code16(KC_LCTL);
                         unregister_code16(KC_LGUI);
 			return false;
-                        break;
                     case KC_ESC: // カスタムキーマップ トグル
 			caps_pressed = false;
                         layer_invert(_QWERTY);
 			return false;
-                        break;
                     case NEW_PSCR: // 定型文1
 			caps_pressed = false;
 			SEND_STRING(MACRO1_STRINGS);
 			return false;
-                        break;
                     case KC_SCROLLLOCK: // 定型文2
 			caps_pressed = false;
 			SEND_STRING(MACRO2_STRINGS);
 			return false;
-                        break;
                     case KC_PAUSE: // 定型文3
 			caps_pressed = false;
 			SEND_STRING(MACRO3_STRINGS);
 			return false;
-                        break;
                     /* case KC_INSERT: // DM_REC1 */
 			/* caps_pressed = false; */
                     /*     register_code16(DM_REC1); */
@@ -535,7 +526,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
 	        is_alt_tab_active = false;
 	    }
             return false;
-            break;
         case LT2_HENK:
             user_lt(record, _HENKAN, KC_HENK, &henk_pressed, &henk_pressed_time, true);
             if (!record->event.pressed && is_alt_tab_active) {
@@ -543,7 +533,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
 	        is_alt_tab_active = false;
 	    }
             return false;
-            break;
         /* case FN1_PSCR: */
         /*   user_lt(record, _FUNCTION1, S(G(KC_S)), &fn1_pscr_pressed, &fn1_pscr_pressed_time, true); */
         /*   return false; */
@@ -568,36 +557,28 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             user_mt(record, KC_LCTL, KC_ESC, &ctl_esc_pressed, &ctl_esc_pressed_time, true);
             if (!record->event.pressed) is_lctl_active = false;
             return false;
-            break;
         case GUI_PSCR:
             user_mt(record, KC_LGUI, S(G(KC_S)), &gui_pscr_pressed, &gui_pscr_pressed_time, true);
             return false;
-            break;
         case ALT_GUI:
             user_mt(record, KC_LALT, KC_LGUI, &alt_gui_pressed, &alt_gui_pressed_time, true);
             return false;
-            break;
         case SFT_SPC:
             user_mt(record, KC_LSFT, KC_SPC, &sft_spc_pressed, &sft_spc_pressed_time, true);
             return false;
-            break;
         case SFT_SSPC:
             user_mt(record, KC_LSFT, S(KC_SPC), &sft_sspc_pressed, &sft_sspc_pressed_time, true);
             return false;
-            break;
         case ALT_KANA:
             user_mt(record, KC_RALT, KC_KANA, &alt_kana_pressed, &alt_kana_pressed_time, true);
             if (!record->event.pressed) is_kana_active = false;
             return false;
-            break;
         case CTL_APP:
             user_mt(record, KC_RCTL, KC_APP, &ctl_app_pressed, &ctl_app_pressed_time, true);
             return false;
-            break;
         case SFT_ZKHK:
             user_mt(record, KC_LSFT, KC_ZKHK, &sft_zkhk_pressed, &sft_zkhk_pressed_time, true);
             return false;
-            break;
         case KC_I: // LCTL + I = TAB
             if (record->event.pressed) {
                 if (is_lctl_active && layer_state_is(_NODOKA)) {
@@ -617,7 +598,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                 }
             }
             return false;
-            break;
 	// 左手マウス用
         case KC_DOT: // Kana + . = Ctrl + C
             if (record->event.pressed) {
@@ -636,7 +616,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                 }
             }
             return false;
-            break;
         case JP_SLSH: // Kana + / = Ctrl + X
             if (record->event.pressed) {
                 if (is_kana_active && layer_state_is(_NODOKA)) {
@@ -654,7 +633,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                 }
             }
             return false;
-            break;
         case JP_BSLS: // Kana + \ = Ctrl + Z
             if (record->event.pressed) {
                 if (is_kana_active && layer_state_is(_NODOKA)) {
@@ -672,7 +650,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                 }
             }
             return false;
-            break;
         case KC_L: // Kana + l = Alt + Y
             if (record->event.pressed) {
                 if (is_kana_active && layer_state_is(_NODOKA)) {
@@ -692,7 +669,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                 }
             }
             return false;
-            break;
         case JP_SCLN: // Kana + ; = Ctrl + V
             if (record->event.pressed) {
                 if (is_kana_active && layer_state_is(_NODOKA)) {
@@ -710,7 +686,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                 }
             }
             return false;
-            break;
 	case JP_COLN: // Kana + : = A + N
             if (record->event.pressed) {
                 if (is_kana_active && layer_state_is(_NODOKA)) {
@@ -730,7 +705,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                 }
             }
             return false;
-            break;
 	case JP_RBRC: // Kana + ] = TAB
             if (record->event.pressed) {
                 if (is_kana_active && layer_state_is(_NODOKA)) {
@@ -748,7 +722,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                 }
             }
             return false;
-            break;
 	case KC_ENT: // Kana + Enter = Ctrl + A
             if (record->event.pressed) {
                 if (is_kana_active && layer_state_is(_NODOKA)) {
@@ -766,7 +739,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                 }
             }
             return false;
-            break;
 	case JP_AT: // Kana + @ = Alt + F4
             if (record->event.pressed) {
                 if (is_kana_active && layer_state_is(_NODOKA)) {
@@ -786,7 +758,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                 }
             }
             return false;
-            break;
 	case JP_LBRC: // Kana + [ = ESC
             if (record->event.pressed) {
                 if (is_kana_active && layer_state_is(_NODOKA)) {
@@ -804,7 +775,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                 }
             }
             return false;
-            break;
   	case NEXTWIN: // ALT+TAB
             if (record->event.pressed) {
                 if (!is_alt_tab_active) {
@@ -816,50 +786,50 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             } else {
                 unregister_code16(KC_TAB);
             }
-            break;
+            return false;
 	// 直接_HENKANレイヤーにC(KC_A)と置くとprocess_recordが呼びだされないようでタップが呼び出されてしまう
   	case CTRL_A:
 	     // モディファイアキーを含むキーは、離す前に他のキーを押して意図しない動作を誘発しないために、離すまでをセットにする
 	     // 例: 無変換 + VでVを離す前にJを押すとCtrl + V + Down になってしまう
             if (record->event.pressed) {
-                register_code16(KC_LCTRL);
+                register_code16(KC_LCTL);
                 register_code16(KC_A);
                 unregister_code16(KC_A);
-                unregister_code16(KC_LCTRL);
+                unregister_code16(KC_LCTL);
             }
-            break;
+            return false;
   	case CTRL_Z:
             if (record->event.pressed) {
-                register_code16(KC_LCTRL);
+                register_code16(KC_LCTL);
                 register_code16(KC_Z);
                 unregister_code16(KC_Z);
-                unregister_code16(KC_LCTRL);
+                unregister_code16(KC_LCTL);
             }
-            break;
+            return false;
   	case CTRL_X:
             if (record->event.pressed) {
-                register_code16(KC_LCTRL);
+                register_code16(KC_LCTL);
                 register_code16(KC_X);
                 unregister_code16(KC_X);
-                unregister_code16(KC_LCTRL);
+                unregister_code16(KC_LCTL);
             }
-            break;
+            return false;
   	case CTRL_C:
             if (record->event.pressed) {
-                register_code16(KC_LCTRL);
+                register_code16(KC_LCTL);
                 register_code16(KC_C);
                 unregister_code16(KC_C);
-                unregister_code16(KC_LCTRL);
+                unregister_code16(KC_LCTL);
             }
-            break;
+            return false;
   	case CTRL_V:
             if (record->event.pressed) {
-                register_code16(KC_LCTRL);
+                register_code16(KC_LCTL);
                 register_code16(KC_V);
                 unregister_code16(KC_V);
-                unregister_code16(KC_LCTRL);
+                unregister_code16(KC_LCTL);
             }
-            break;
+            return false;
   	case ALT_F4:
             if (record->event.pressed) {
                 register_code16(KC_LALT);
@@ -867,7 +837,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                 unregister_code16(KC_F4);
                 unregister_code16(KC_LALT);
             }
-            break;
+            return false;
   	case NEW_PSCR:
             if (record->event.pressed) {
                 register_code16(KC_LGUI);
@@ -878,7 +848,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                 unregister_code16(KC_LSFT);
                 unregister_code16(KC_LGUI);
             }
-            break;
+            return false;
   	case WIN_V:
             if (record->event.pressed) {
                 register_code16(KC_LGUI);
@@ -886,17 +856,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                 unregister_code16(KC_V);
                 unregister_code16(KC_LGUI);
             }
-            break;
+            return false;
 	case OSL_CAPS:
             user_osl(record, &caps_pressed, &caps_pressed_time);
             return false;
-            break;
 
 
         case KC_BTN1 ... KC_BTN5: {
             mouse_send_flag = true;
             return true;
-        } break;
+        }
 
         case KC_MS_WH_UP ... KC_MS_WH_DOWN: {
             if (wheel_move_v != 0) {
@@ -909,7 +878,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             } else {
                 return true;
             }
-        } break;
+        }
 
         case KC_MS_WH_LEFT ... KC_MS_WH_RIGHT: {
             if (wheel_move_h != 0) {
@@ -922,7 +891,41 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
             } else {
                 return true;
             }
-        } break;
+        }
+
+	// CTRLとwinキーが直接使用すると入れ替わる謎のバグが発生している。
+	// 原因不明だが取りあえずこれで対処できる
+        case KC_LCTL:
+            if (record->event.pressed) {
+	        register_code16(KC_LCTL);
+            } else {
+	        unregister_code16(KC_LCTL);
+            }
+	    return false;
+
+        case KC_LGUI:
+            if (record->event.pressed) {
+	        register_code16(KC_LGUI);
+            } else {
+	        unregister_code16(KC_LGUI);
+            }
+	    return false;
+
+        case KC_RCTL:
+            if (record->event.pressed) {
+	        register_code16(KC_RCTL);
+            } else {
+	        unregister_code16(KC_RCTL);
+            }
+	    return false;
+
+        case KC_RGUI:
+            if (record->event.pressed) {
+	        register_code16(KC_RGUI);
+            } else {
+	        unregister_code16(KC_RGUI);
+            }
+	    return false;
 
         case SPD_1:
             spd_rate_num = 1;
