@@ -46,6 +46,7 @@ enum custom_keycodes {
     SFT_SSPC,
     LT2_MHEN,
     LT2_HENK,
+    HENK_APP,
     ALT_KANA, 
     ALT_GUI,
     CTL_ESC, 
@@ -112,7 +113,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     _______,  KC_1,  KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0, JP_MINS, JP_CIRC,                   JP_YEN,             DM_PLY1, DM_PLY2, _______,    _______, _______, _______, _______,
     _______,   CTRL_A,  NEXTWIN, KC_INS, ALT_F4,  KC_END, KC_LEFT , KC_DOWN, KC_UP, KC_RGHT, KC_PGDN, KC_PGUP, _______ ,                                         _______, _______, _______,
     _______,    CTRL_Z,  CTRL_X,  CTRL_C,  CTRL_V,  KC_HOME, KC_BSPC, KC_DEL, WIN_V, _______, _______, _______, _______,                     _______,            _______, _______, _______, _______,
-    _______, _______, _______, _______, SFT_SSPC, KC_APP, _______, _______, _______, _______, _______,                             _______,  _______, _______,   _______,          _______,
+    _______, _______, _______, _______, SFT_SSPC, HENK_APP, _______, _______, _______, _______, _______,                             _______,  _______, _______,   _______,          _______,
 
     _______, _______, _______, _______, _______, _______, _______, _______,
     _______, _______, _______, _______,
@@ -203,26 +204,26 @@ static bool jp_lbrc_with_mouse = false;
 // user_lt(record, ホールド時移行先レイヤー, タップ時のキーコード, モディファイアキー押下判定のための変数, trueならTAPPING_TERMに影響受けない)
 static void user_lt(keyrecord_t *record, int layer, uint16_t keycode, bool *modifier_pressed, uint16_t *modifier_pressed_time, bool tapping_term_disable) {
         if (record->event.pressed) {
-        *modifier_pressed = true;
-	 // record->event.timeではなくtimer_readでないと正常に動作しない
-        *modifier_pressed_time = timer_read();
+		*modifier_pressed = true;
+		 // record->event.timeではなくtimer_readでないと正常に動作しない
+		*modifier_pressed_time = timer_read();
 
-	if (layer == _HENKAN) henk_layer_count += 1;
-        layer_on(layer);
-      } else {
-	if (layer == _HENKAN) {
-		henk_layer_count -= 1;
-		if (henk_layer_count == 0) layer_off(layer);
-	} else {
-		layer_off(layer);
-	}
+		if (layer == _HENKAN) henk_layer_count += 1;
+		layer_on(layer);
+        } else {
+		if (layer == _HENKAN) {
+			henk_layer_count -= 1;
+			if (henk_layer_count == 0) layer_off(layer);
+		} else {
+			layer_off(layer);
+		}
 
-        if (*modifier_pressed && (tapping_term_disable || (timer_elapsed(*modifier_pressed_time) < TAPPING_TERM))) {
-          register_code16(keycode);
-          unregister_code16(keycode);
+		if (*modifier_pressed && (tapping_term_disable || (timer_elapsed(*modifier_pressed_time) < TAPPING_TERM))) {
+		  register_code16(keycode);
+		  unregister_code16(keycode);
+		}
+		*modifier_pressed = false;
         }
-        *modifier_pressed = false;
-      }
 }
 
 // user_mt(record, ホールド時キーコードー, タップ時のキーコード, モディファイアキー押下判定のための変数, trueならTAPPING_TERMに影響受けない)
@@ -539,6 +540,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
 	        unregister_code16(KC_LALT);
 	        is_alt_tab_active = false;
 	    }
+            return false;
+        case HENK_APP:
+            user_lt(record, _HENKAN, KC_APP, &henk_pressed, &henk_pressed_time, true);
             return false;
         /* case FN1_PSCR: */
         /*   user_lt(record, _FUNCTION1, S(G(KC_S)), &fn1_pscr_pressed, &fn1_pscr_pressed_time, true); */
