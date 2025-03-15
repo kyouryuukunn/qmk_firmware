@@ -149,6 +149,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 /* static int last_spc_pressed_time = 0; */
 
+static uint16_t henk_layer_count = 0;
 static bool mhen_pressed = false;
 static uint16_t mhen_pressed_time = 0;
 static bool henk_pressed = false;
@@ -206,9 +207,15 @@ static void user_lt(keyrecord_t *record, int layer, uint16_t keycode, bool *modi
 	 // record->event.timeではなくtimer_readでないと正常に動作しない
         *modifier_pressed_time = timer_read();
 
+	if (layer == _HENKAN) henk_layer_count += 1;
         layer_on(layer);
       } else {
-        layer_off(layer);
+	if (layer == _HENKAN) {
+		henk_layer_count -= 1;
+		if (henk_layer_count == 0) layer_off(layer);
+	} else {
+		layer_off(layer);
+	}
 
         if (*modifier_pressed && (tapping_term_disable || (timer_elapsed(*modifier_pressed_time) < TAPPING_TERM))) {
           register_code16(keycode);
