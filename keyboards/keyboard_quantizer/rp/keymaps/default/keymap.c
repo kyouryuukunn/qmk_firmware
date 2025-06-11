@@ -15,7 +15,8 @@
  */
 /* 基本的にはNodokaの動作を踏襲しているが、caps + ESC でnodokaモードをトグル(デフォルトオン) クリックの左右反転のレイアウトで実施*/
 /* Insertからのpagedowmまでのキーを変換or無変換有りで押すとマクロ実行(Capsでは動作しない) */
-/*  */
+/* マクロレコード中に変換キーを操作するとレイヤーが戻らないので通常のキーボードとして使用する*/
+/* マクロ1は遅延なし、マクロ2は0.1s間隔あり マクロの時間はconfig.hで定義する
 /* DM_REC1, DM_REC2, DM_RSTP */
 /* DM_PLY1, DM_PLY2,     -   */
 
@@ -84,12 +85,6 @@ enum layer_names {
     _TEMPLATE,
 };
 
-#define MC_REC1   DYN_REC_START1   
-#define MC_REC2   DYN_REC_START2   
-#define MC_PLAY1  DYN_MACRO_PLAY1   
-#define MC_PLAY2  DYN_MACRO_PLAY1   
-#define MC_STOP   DYN_REC_STOP     
-
  // なぜか入れるハードで動作が異なる KC_RCTRL,  KC_RGUIの位置に注意 とりあえず両方RCTRLにした
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -150,7 +145,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 /* static int last_spc_pressed_time = 0; */
 
-static uint16_t henk_layer_count = 0;
+static bool mhen_true_pressed = false;
+static bool henk_true_pressed = false;
 static bool mhen_pressed = false;
 static uint16_t mhen_pressed_time = 0;
 static bool henk_pressed = false;
@@ -208,12 +204,12 @@ static void user_lt(keyrecord_t *record, int layer, uint16_t keycode, bool *modi
 		 // record->event.timeではなくtimer_readでないと正常に動作しない
 		*modifier_pressed_time = timer_read();
 
-		if (layer == _HENKAN) henk_layer_count += 1;
 		layer_on(layer);
         } else {
 		if (layer == _HENKAN) {
-			henk_layer_count -= 1;
-			if (henk_layer_count == 0) layer_off(layer);
+			if (!mhen_true_pressed && !henk_true_pressed) {
+				layer_off(layer);
+			}
 		} else {
 			layer_off(layer);
 		}
@@ -528,6 +524,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
     }
     switch (keycode) {
         case LT2_MHEN:
+            if (record->event.pressed) {
+		mhen_true_pressed = true;
+	    } else {
+		mhen_true_pressed = false;
+	    }
             user_lt(record, _HENKAN, KC_ENT, &mhen_pressed, &mhen_pressed_time, true);
             if (!record->event.pressed && is_alt_tab_active) {
 	        unregister_code16(KC_LALT);
@@ -535,6 +536,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
 	    }
             return false;
         case LT2_HENK:
+            if (record->event.pressed) {
+		henk_true_pressed = true;
+	    } else {
+		henk_true_pressed = false;
+	    }
             user_lt(record, _HENKAN, KC_HENK, &henk_pressed, &henk_pressed_time, true);
             if (!record->event.pressed && is_alt_tab_active) {
 	        unregister_code16(KC_LALT);
@@ -871,6 +877,24 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
 	case OSL_CAPS:
             user_osl(record, &caps_pressed, &caps_pressed_time);
             return false;
+	/* case RESET_LAYER_COUNT: */
+	/*     henk_layer_count = 0; */
+        /*     return false; */
+	/* なぜか動作しないcの入力になる */
+  	/* case KM_PLY1: */
+        /*     if (!record->event.pressed) { */
+	/*         unregister_code16(LT2_MHEN); */
+	/*         unregister_code16(LT2_HENK); */
+        /*         tap_code(DM_PLY1); */
+        /*     } */
+        /*     return false; */
+  	/* case KM_PLY2: */
+        /*     if (!record->event.pressed) { */
+	/*         unregister_code16(LT2_MHEN); */
+	/*         unregister_code16(LT2_HENK); */
+        /*         tap_code(DM_PLY2); */
+        /*     } */
+        /*     return false; */
 
 
         case KC_BTN1 ... KC_BTN5: {
@@ -1181,6 +1205,12 @@ void mouse_report_hook(mouse_parse_result_t const* report) {
     }
 }
 
+/* マクロ実行後にレイヤーが戻らなくなる */
+/* void dynamic_macro_play_user(int8_t direction) { */
+/*     unregister_code16(LT2_MHEN); */
+/*     unregister_code16(LT2_HENK); */
+/* } */
+
 void eeconfig_init_user(void) {
     user_config.raw = 0;
     eeconfig_update_user(user_config.raw);
@@ -1192,3 +1222,4 @@ void keyboard_post_init_user(void) {
         user_config.gesture_threshold = GESTURE_MOVE_THRESHOLD_DEFAULT / 10;
     }
 }
+

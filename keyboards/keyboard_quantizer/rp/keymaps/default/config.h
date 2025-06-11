@@ -19,4 +19,5 @@
 // place overrides here
 #undef QUANTIZER_REPORT_PARSER
 #define QUANTIZER_REPORT_PARSER REPORT_PARSER_USER
-#define DYNAMIC_MACRO_DELAY 50
+#define DYNAMIC_MACRO_DELAY1 0      //ms マクロ1
+#define DYNAMIC_MACRO_DELAY2 100    //ms マクロ2 長過ぎると長押し判定される
