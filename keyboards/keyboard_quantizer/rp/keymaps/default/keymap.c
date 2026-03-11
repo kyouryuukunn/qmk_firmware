@@ -196,6 +196,9 @@ static bool jp_rbrc_with_mouse = false;
 static bool kc_ent_with_mouse = false;
 static bool jp_at_with_mouse = false;
 static bool jp_lbrc_with_mouse = false;
+static uint16_t macro_start_time = 0;
+static uint16_t macro_state = 0;
+
 
 // user_lt(record, ホールド時移行先レイヤー, タップ時のキーコード, モディファイアキー押下判定のための変数, trueならTAPPING_TERMに影響受けない)
 static void user_lt(keyrecord_t *record, int layer, uint16_t keycode, bool *modifier_pressed, uint16_t *modifier_pressed_time, bool tapping_term_disable) {
@@ -369,7 +372,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
         if (keycode != OSL_CAPS){
             if (caps_pressed) {
                 switch (keycode) {
-                    case KC_A:  // win + 1
+                    case KC_A:  // win + 1(Explore)
 			// 以下の形式ではボタンが押しっぱなしになる
                         /* register_code16(G(KC_1)); */
                         /* unregister_code16(G(KC_1)); */
@@ -379,60 +382,67 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                         unregister_code16(KC_1);
                         unregister_code16(KC_LGUI);
 			return false;
-                    case KC_G:  // win + 2
+                    case KC_G:  // win + 2(Gvim)
 			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_2);
                         unregister_code16(KC_2);
                         unregister_code16(KC_LGUI);
 			return false;
-                    case KC_F:  // win + 3
+                    case KC_F:  // win + 3(Firefox)
 			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_3);
                         unregister_code16(KC_3);
                         unregister_code16(KC_LGUI);
 			return false;
-                    case KC_N:  // win + 4
+                    case KC_N:  // win + 4(RemoteDesktop)
 			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_4);
                         unregister_code16(KC_4);
                         unregister_code16(KC_LGUI);
 			return false;
-                    case KC_O:  // win + 5
+                    case KC_O:  // win + 5(Outlook)
 			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_5);
                         unregister_code16(KC_5);
                         unregister_code16(KC_LGUI);
 			return false;
-                    case KC_I:  // win + 6
+                    case KC_I:  // win + 6(Image)
 			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_6);
                         unregister_code16(KC_6);
                         unregister_code16(KC_LGUI);
 			return false;
-                    case KC_E:  // win + 7
+                    case KC_E:  // win + 7(Excel)
 			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_7);
                         unregister_code16(KC_7);
                         unregister_code16(KC_LGUI);
 			return false;
-                    case KC_S:  // win + 8
+                    case KC_R:  // win + 8(PDF)
 			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_8);
                         unregister_code16(KC_8);
                         unregister_code16(KC_LGUI);
 			return false;
-                    case KC_D:  // win + 9
+                    case KC_S:  // win + 9
 			caps_pressed = false;
                         register_code16(KC_LGUI);
                         register_code16(KC_9);
                         unregister_code16(KC_9);
+                        unregister_code16(KC_LGUI);
+			return false;
+                    case KC_D:  // win + 0
+			caps_pressed = false;
+                        register_code16(KC_LGUI);
+                        register_code16(KC_0);
+                        unregister_code16(KC_0);
                         unregister_code16(KC_LGUI);
 			return false;
 		 // Win + 上下左右
@@ -469,8 +479,24 @@ bool process_record_user(uint16_t keycode, keyrecord_t* record) {
                         register_code16(KC_LGUI);
                         register_code16(KC_LCTL);
                         register_code16(KC_T);
+                        unregister_code16(KC_T);
                         unregister_code16(KC_LCTL);
                         unregister_code16(KC_LGUI);
+			return false;
+                    case KC_F9: // login
+			caps_pressed = false;
+			macro_start_time = timer_read();
+			macro_state = 1;
+			return false;
+                    case KC_F10: // timecardin
+			caps_pressed = false;
+			macro_start_time = timer_read();
+			macro_state = 10;
+			return false;
+                    case KC_F11: // timecardout
+			caps_pressed = false;
+			macro_start_time = timer_read();
+			macro_state = 20;
 			return false;
                     case KC_ESC: // カスタムキーマップ トグル
 			caps_pressed = false;
@@ -1063,6 +1089,158 @@ void matrix_scan_user(void) {
     /*   } */
     /* } */
     if (caps_pressed && (timer_elapsed(caps_pressed_time) > TWO_STROKE_THRESHOLD)) {register_code16(KC_CAPS); unregister_code16(KC_CAPS); caps_pressed = false;}
+
+    // wait_ms, SEND_STRING(SS_DELAY(10))は遅延時間が長いとクラッシュするので長いマクロをこちらで実行する
+    switch (macro_state) {
+        case 1:
+            if (timer_elapsed(macro_start_time) > 20000) {
+		register_code16(C(A(KC_DEL))); // CTRL + ALT + DEL
+		unregister_code16(C(A(KC_DEL))); // CTRL + ALT + DEL
+
+                macro_state += 1;
+	    }
+	    break;
+        case 2:
+            if (timer_elapsed(macro_start_time) > 30000) {
+		SEND_STRING(MACR_login);
+		wait_ms(1000);
+		register_code16(KC_ENT); unregister_code16(KC_ENT);
+
+                macro_state += 1;
+	    }
+	    break;
+        case 3:
+            if (timer_elapsed(macro_start_time) > 34000) {
+		SEND_STRING(MACR_login);
+
+                macro_state = 0;
+	    }
+	    break;
+        case 10:
+	    register_code16(KC_F5); unregister_code16(KC_F5);
+            macro_state += 1;
+	    break;
+        case 11:
+            if (timer_elapsed(macro_start_time) > 5000) {
+		register_code16(KC_ENT); unregister_code16(KC_ENT);
+                macro_state += 1;
+	    }
+	    break;
+        case 12:
+            if (timer_elapsed(macro_start_time) > 8000) {
+		register_code16(KC_DOWN); unregister_code16(KC_DOWN);
+		wait_ms(500);
+		register_code16(KC_DOWN); unregister_code16(KC_DOWN);
+		wait_ms(500);
+		register_code16(KC_ENT); unregister_code16(KC_ENT);
+		wait_ms(500);
+		register_code16(KC_ENT); unregister_code16(KC_ENT);
+                macro_state += 1;
+	    }
+	    break;
+        case 13:
+            if (timer_elapsed(macro_start_time) > 13000) {
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_ENT); unregister_code16(KC_ENT);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_ENT); unregister_code16(KC_ENT);
+                macro_state += 1;
+	    }
+	    break;
+        case 14:
+            if (timer_elapsed(macro_start_time) > 17400) {
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_ENT); unregister_code16(KC_ENT);
+                macro_state = 0;
+	    }
+	    break;
+        case 20:
+	    register_code16(KC_F5); unregister_code16(KC_F5);
+            macro_state += 1;
+	    break;
+        case 21:
+            if (timer_elapsed(macro_start_time) > 5000) {
+		register_code16(KC_ENT); unregister_code16(KC_ENT);
+                macro_state += 1;
+	    }
+	    break;
+        case 22:
+            if (timer_elapsed(macro_start_time) > 8000) {
+		register_code16(KC_DOWN); unregister_code16(KC_DOWN);
+		wait_ms(500);
+		register_code16(KC_DOWN); unregister_code16(KC_DOWN);
+		wait_ms(500);
+		register_code16(KC_ENT); unregister_code16(KC_ENT);
+		wait_ms(500);
+		register_code16(KC_ENT); unregister_code16(KC_ENT);
+                macro_state += 1;
+	    }
+	    break;
+        case 23:
+            if (timer_elapsed(macro_start_time) > 13000) {
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_ENT); unregister_code16(KC_ENT);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_ENT); unregister_code16(KC_ENT);
+                macro_state += 1;
+	    }
+	    break;
+        case 24:
+            if (timer_elapsed(macro_start_time) > 17400) {
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_TAB); unregister_code16(KC_TAB);
+		wait_ms(200);
+		register_code16(KC_ENT); unregister_code16(KC_ENT);
+                macro_state = 0;
+	    }
+	    break;
+        default:
+	    macro_state = 0;
+    }
 }
 
 // Start gesture recognition
